@@ -14,7 +14,7 @@ Add the dependency to your project:
 ```xml
 <dependency>
     <groupId>ir.bamap.blu</groupId>
-    <artifactId>data-jpa</artifactId>
+    <artifactId>kt-mapper</artifactId>
     <version>1.0.1</version>
 </dependency>
 ```
