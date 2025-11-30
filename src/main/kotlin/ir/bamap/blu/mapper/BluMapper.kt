@@ -1,5 +1,6 @@
 package ir.bamap.blu.mapper
 
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
@@ -15,7 +16,9 @@ abstract class BluMapper<Entity : Any, DTO : Any>(
     protected open val dtoClass: KClass<DTO>
 ) {
 
-    private fun <T : Any> mapByPrimaryConstructor(
+    private val logger = LoggerFactory.getLogger(BluMapper::class.java)
+
+    protected fun <T : Any> mapByPrimaryConstructor(
         source: Any,
         targetClass: KClass<T>,
         initProperties: Map<String, Any?> = emptyMap(),
@@ -62,7 +65,12 @@ abstract class BluMapper<Entity : Any, DTO : Any>(
                 srcProperty.isAccessible = accessible
             }
 
-        return targetConstructor.callBy(args)
+        try {
+            return targetConstructor.callBy(args)
+        } catch (exception: RuntimeException) {
+            logger.error("Error create an instance of ${targetClass.simpleName} by primary constructor", exception)
+            throw exception
+        }
     }
 
     protected fun <T : Any> updateBySetter(
