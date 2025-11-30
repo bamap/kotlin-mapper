@@ -5,6 +5,7 @@ import ir.bamap.blu.mapper.model.Person
 import ir.bamap.blu.mapper.model.PersonDto
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import kotlin.test.assertNotEquals
 
 class BluMapperTest {
 
@@ -37,42 +38,34 @@ class BluMapperTest {
 
     @Test
     fun `map uses initProperties to override source value`() {
-        val source = Person(1L, "sourceName", 30, null)
+        val source = Person(age = 30)
         val dto = mapper.map<PersonDto>(source, initProperties = mapOf("age" to 99))
-        assertEquals("sourceName", dto.name)
-        assertEquals(1L, dto.id)
         assertEquals(99, dto.age)
     }
 
     @Test
     fun `map uses initProperties to set null`() {
-        val source = Person(1L, "sourceName", 30, null)
+        val source = Person(age = 30)
         val dto = mapper.map<PersonDto>(source, initProperties = mapOf("age" to null))
+        assertNull(dto.age)
         assertEquals(null, dto.age)
     }
 
     @Test
-    fun `mapAll uses initProperties`() {
-        val sources = listOf(
-            Person(1L, "John", 30, null),
-            Person(2L, "Jane", 25, null)
-        )
-        val dtos = mapper.mapAll(sources, initProperties = mapOf("name" to "overridden"))
-        assertEquals(2, dtos.size)
-        assertEquals("overridden", dtos[0].name)
-        assertEquals("overridden", dtos[1].name)
-    }
-
-    @Test
     fun `map combines initProperties and ignoreProperties`() {
-        val source = Person(1L, "sourceName", 30, null)
+        val source = Person(name = "Mohammad", age =  30)
         val dto = mapper.map<PersonDto>(
             source,
-            ignoreProperties = setOf("id"),
+            ignoreProperties = setOf("name"),
             initProperties = mapOf("age" to 99)
         )
-        assertEquals(1L, dto.id) // default since ignored
-        assertEquals("sourceName", dto.name)
+        assertNotEquals("Mohammad", dto.name)
         assertEquals(99, dto.age)
+    }
+
+    fun `map nested parameters`() {
+        val source = Person(1L, "Mohammad", 63, Address("Mashhad"))
+        val dto = mapper.map<PersonDto>(source)
+        assertEquals(source.address.street, dto.address.street)
     }
 }

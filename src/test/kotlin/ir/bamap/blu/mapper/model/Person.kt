@@ -4,6 +4,6 @@ data class Person(
     val id: Long = 0,
     val name: String = "Ali",
     val age: Int = 0,
-    val address: Address? = null
+    val address: Address = Address("Mecca")
 ) {
 }
